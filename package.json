@@ -1,0 +1,24 @@
+{
+  "name": "db_orm",
+  "version": "1.0.0",
+  "description": "Al's little database object-relational-mapper",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "/opt/git/db_orm"
+  },
+  "keywords": [
+    "database",
+    "postgres",
+    "postgresql",
+    "orm"
+  ],
+  "author": "Al Carruth",
+  "license": "ISC",
+  "devDependencies": {
+    "coffeescript": "^2.4.1"
+  }
+}
