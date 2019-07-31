@@ -211,22 +211,24 @@
     }
 
     async __find_by_id(id) {
-      var error, qs, rows;
-      qs = `select * from ${this.__name} where ${this.__primary_key} = '${id}'`;
+      var error, rows, text, values;
+      text = `select * from ${this.__name} where ${this.__primary_key} = $1 `;
+      values = [id];
       try {
-        rows = (await this.__db.query(qs));
+        rows = (await this.__db.query(text, values));
         return new this.__Row_Class(rows[0]);
       } catch (error1) {
         error = error1;
-        return console.log(`Query failed: "${qs}"`);
+        return console.log(`Query failed:\n  text: "${text}"\n  values: [ ${values} ]\n`);
       }
     }
 
     async __find_all(col, val) {
-      var qs, row, rows;
-      qs = `select * from ${this.__name} where ${col} = '${val}'`;
+      var row, rows, text, values;
+      text = `select * from ${this.__name} where ${col} = $1 `;
+      values = [val];
       try {
-        rows = (await this.__db.query(qs));
+        rows = (await this.__db.query(text, values));
         return (function() {
           var i, len, results;
           results = [];
@@ -237,7 +239,7 @@
           return results;
         }).call(this);
       } catch (error1) {
-        return console.log(`Query failed: "${qs}"`);
+        return console.log(`Query failed:\n  text: "${text}"\n  values: ${values}\n`);
       }
     }
 

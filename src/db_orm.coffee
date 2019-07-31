@@ -132,20 +132,22 @@ class Table
     @__rows[row.get_primary_key()] = row
 
   __find_by_id: (id) =>
-    qs = "select * from #{@__name} where #{@__primary_key} = '#{id}'"
+    text = "select * from #{@__name} where #{@__primary_key} = $1 "
+    values = [ id ]
     try
-      rows = await @__db.query(qs)
+      rows = await @__db.query(text, values)
       return new @__Row_Class(rows[0])
     catch error
-      console.log("Query failed: \"#{qs}\"")
+      console.log("Query failed:\n  text: \"#{text}\"\n  values: [ #{values} ]\n")
 
   __find_all: (col, val) =>
-    qs = "select * from #{@__name} where #{col} = '#{val}'"
+    text = "select * from #{@__name} where #{col} = $1 "
+    values = [ val ]
     try
-      rows = await @__db.query(qs)
+      rows = await @__db.query(text, values)
       return (new @__Row_Class(row) for row in rows)
     catch
-      console.log("Query failed: \"#{qs}\"")
+      console.log("Query failed:\n  text: \"#{text}\"\n  values: #{values}\n")
       
   __remove_row: (id) =>
     delete @__rows[id]
