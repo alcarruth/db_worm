@@ -1,3 +1,3 @@
 #!/bin/sh
 
-coffee -c -o js/ src/db_orm.coffee
+coffee -c -o js/ src/db_worm.coffee
