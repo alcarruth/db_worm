@@ -5,18 +5,24 @@ db_orm = require('./js/db_orm');
 Table = db_orm.Table
 Table_Row = db_orm.Table_Row
 
-String_Column = db_orm.String_Column
-Integer_Column = db_orm.Integer_Column
-Date_Column = db_orm.Date_Column
+SQL_Column = db_orm.SQL_Column
+SQL_String = db_orm.SQL_String
+SQL_Integer = db_orm.SQL_Integer
+SQL_Date = db_orm.SQL_Date
 
 Reference = db_orm.Reference
 Back_Reference = db_orm.Back_Reference
+Local_Method = db_orm.Local_Method
 
 exports.Table = Table;
 exports.Table_Row = Table_Row;
-exports.String_Column = String_Column;
-exports.Integer_Column = Integer_Column;
-exports.Date_Column = Date_Column;
+
+exports.SQL_Column = SQL_Column;
+exports.SQL_String = SQL_String;
+exports.SQL_Integer = SQL_Integer;
+exports.SQL_Date = SQL_Date;
+
 exports.Reference = Reference;
 exports.Back_Reference = Back_Reference;
+exports.Local_Method = Local_Method;
 

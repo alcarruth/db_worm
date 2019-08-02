@@ -1,14 +1,14 @@
 {
-  "name": "db_orm",
+  "name": "db_worm",
   "version": "1.0.0",
-  "description": "Al's little database object-relational-mapper",
+  "description": "A database web-object relational mapper",
   "main": "index.js",
   "scripts": {
     "test": "test"
   },
   "repository": {
     "type": "git",
-    "url": "/opt/git/db_orm"
+    "url": "/opt/git/db_worm"
   },
   "keywords": [
     "database",
@@ -17,7 +17,7 @@
     "orm"
   ],
   "author": "Al Carruth",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "coffeescript": "^2.4.1"
   }

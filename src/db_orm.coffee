@@ -1,74 +1,71 @@
 #!/usr/bin/env coffee
 # -*- coding: utf-8 -*-
 
+class Local_Method
+  
+  constructor: (@method) ->
 
-class Reference
+  __method: (name) =>
+    @name = name
+    return @method
+  
+class Column
 
-  constructor: ( @table_name, @key_name) ->
+  constructor: ->
+  
+  __method: (name) =>
+    @name = name
+    try
+      @__column_method()
+    catch error
+      console.log("Error in #{@constructor.name} method.")
+        
 
-  __method: =>
+class Reference extends Column
+
+  constructor: (table_name, key_name) ->
+    super()
+    @table_name = table_name
+    @key_name = key_name
+
+  __column_method: =>
     table_name = @table_name
     key_name = @key_name
     return () ->
-      try
-        table = @__db.tables[table_name]
-        key = @__local[key_name]
-        table.__find_by_id(key)
-      catch error
-        console.log('Error in reference method.')
+      table = @__db.tables[table_name]
+      key = @__obj[key_name]
+      table.find_by_id(key)
 
 
-class Back_Reference
+class Back_Reference extends Column
 
-  constructor: (@table_name, @col) ->
-
-  __method: =>
+  constructor: (table_name, col) ->
+    super()
+    @table_name = table_name
+    @col = col
+    
+  __column_method: =>
     table_name = @table_name
     col = @col
     return () ->
-      try
-        table = @__db.tables[table_name]
-        id = @__id
-        table.__find_all(col, id)
-      catch error
-        console.log('Error back_reference method.')
+      table = @__db.tables[table_name]
+      id = @__id
+      table.find_where(col, id)
 
 
-class String_Column
+class SQL_Column extends Column
 
   constructor: ->
+    super()
+        
+  __column_method: =>
+    name = @name
+    return () ->
+      @__obj[name]
 
-  __method: (name) =>
-    return ->
-      try
-        @__local[name]
-      catch error
-        console.log('Error in string column method')
-    
-
-class Integer_Column
-
-  constructor: ->
-
-  __method: (name) =>
-    return ->
-      try
-        @__local[name]
-      catch error
-        console.log('Error in integer column method')
-    
-
-class Date_Column
-
-  constructor: ->
-
-  __method: (name) =>
-    return ->
-      try
-        @__local[name]
-      catch error
-        console.log('Error in date column method')
-
+class SQL_String extends SQL_Column
+class SQL_Integer extends SQL_Column
+class SQL_Date extends SQL_Column
 
 
 #------------------------------------------------------------------------------------
@@ -85,69 +82,72 @@ class Table
     @__db = spec.db
     @__name = spec.tablename
     @__primary_key = spec.primary_key
-    @__columns = spec.columns || []
-    @__foreign_keys = spec.foreign_keys || {}
-    @__back_references = spec.back_references || {}
-    @__Row_Class = spec.row_class
+    @__sql_columns = spec.sql_columns || []
+    @__pseudo_columns = spec.pseudo_columns || []
+    @__Row_Class = @__row_class(this)
     @__rows = {}
     @__db.tables[@__name] = this
+    @__unique_id = "table-#{@__name}"
     @__add_methods()
 
+  __row_class: (table) ->
+     class __Row_Class extends Table_Row
+      constructor: (obj) ->
+        super(table, obj)
+        
   __add_methods: =>
-    for name, column of @__columns
+    for name, column of @__sql_columns
+      @__Row_Class::[name] = column.__method(name)
+    for name, column of @__pseudo_columns
       @__Row_Class::[name] = column.__method(name)
 
-  __add_methods_old: =>
-    for name in @__columns
-      @__add_column_method(name)
-    for name, spec of @__foreign_keys
-      @__add_foreign_key_method(name, spec)
-    for name, spec of @__back_references
-      @__add_back_reference_method(name, spec)
-
-  __add_column_method: (name) =>
-    @__Row_Class::[name] = ->
-      @__local[name]
-
-  __add_foreign_key_method: (name, spec) =>
-    { table_name, key_name } = spec
-    @__Row_Class::[name] = ->
-      table = @__db.tables[table_name]
-      key = @__local[key_name]
-      table.__find_by_id(key)
-
-  __add_back_reference_method: (name, spec) =>
-    { table_name, col } = spec
-    @__Row_Class::[name] = ->
-      table = @__db.tables[table_name]
-      table.__find_all(col, @__id)
-
-
- # __handle_back_reference: (row, name, spec) =>
-    
-      
   # TODO: insert into DB
+  insert: (obj) =>
+    cols = (k for k,v of @__sql_columns)
+    text = "insert into #{@__name}(#{cols.join(',')})"
+    values = (obj[col] for col in cols)
+    console.log("Trying query:\n  text: \"#{text}\"\n  values: [ #{values} ]\n")
+    try
+     # db.query(text, values)
+    catch error
+      console.log(error)
+    
   __add_row: (obj) => 
     row = new @__Row_Class(obj)
     @__rows[row.get_primary_key()] = row
 
-  __find_by_id: (id) =>
-    text = "select * from #{@__name} where #{@__primary_key} = $1 "
-    values = [ id ]
+  find_all: (id) =>
+    text = "select * from #{@__name}"
+    values = [ ]
     try
-      rows = await @__db.query(text, values)
-      return new @__Row_Class(rows[0])
+      rows = @__db.query(text, values)
+      return (new @__Row_Class(row) for row in await rows)
     catch error
       console.log("Query failed:\n  text: \"#{text}\"\n  values: [ #{values} ]\n")
+      console.log(error)
 
-  __find_all: (col, val) =>
-    text = "select * from #{@__name} where #{col} = $1 "
-    values = [ val ]
+  find_by_id: (id) =>
+    #text = "select * from #{@__name} where #{@__primary_key} = $1 "
+    #values = [ id ]
+    text = "select * from #{@__name} where #{@__primary_key} = '#{id}' "
+    values = [ ]
     try
-      rows = await @__db.query(text, values)
-      return (new @__Row_Class(row) for row in rows)
-    catch
-      console.log("Query failed:\n  text: \"#{text}\"\n  values: #{values}\n")
+      rows = @__db.query(text, values)
+      return new @__Row_Class((await rows)[0])
+    catch error
+       console.log(error)
+
+  find_where: (col, val) =>
+    #text = "select * from #{@__name} where #{col} = '$1' "
+    #values = [ val ]
+    text = "select * from #{@__name} where #{col} = '#{val}' "
+    values = [ ]
+    try
+      rows = @__db.query(text, values)
+      return (new @__Row_Class(row) for row in await rows)
+    catch error
+      console.log("Query failed:\n  text: \"#{text}\"\n  values: [ #{values} ]\n")
+      console.log(error)
       
   __remove_row: (id) =>
     delete @__rows[id]
@@ -161,38 +161,39 @@ class Table
 # 
 class Table_Row
 
-  constructor: (@__table) ->
+  constructor: (@__table, @__obj) ->
     @__db = @__table.__db
-    @__local = {}
     for name, method of this.__proto__
       this[name] = method.bind(this)
-
-  __init: (obj) =>
-    for col,_ of @__table.__columns
-      @__local[col] = obj[col] || null
-    @__id = @__local[@__table.__primary_key]
+    @__id = @__obj[@__table.__primary_key]
+    @__unique_id = "#{@__table.__name}-#{@__id}"
       
-  __simple_obj: =>
+  simple_obj: =>
     obj = {}
-    for col in @__table.__columns
-      obj[col] = this[col]()
+    for col, val of @__obj
+      obj[col] = val
     return obj
     
-  __toJSON: =>
-    JSON.stringify(@__simple_obj())
+  toJSON: =>
+    JSON.stringify(@simple_obj())
       
-  __toString: =>
-    return @__toJSON()
+  toString: =>
+    return @toJSON()
     
-  __toHTML: =>
+  toHTML: =>
     # some suitable default
 
 
 exports.Table = Table
 exports.Table_Row = Table_Row
-exports.String_Column = String_Column
-exports.Integer_Column = Integer_Column
-exports.Date_Column = Date_Column
+
+exports.SQL_Column = SQL_Column
+exports.SQL_String = SQL_String
+exports.SQL_Integer = SQL_Integer
+exports.SQL_Date = SQL_Date
+
 exports.Reference = Reference
+exports.Local_Method = Local_Method
 exports.Back_Reference = Back_Reference
+
 
