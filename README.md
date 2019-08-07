@@ -128,11 +128,11 @@ specifying a particular choice.
 ### Table Row Caching
 
 With the tickets app, for example, the `conference` and `team` tables,
-and perhaps also the `game` table, are essentially static and are
-needed to render basic pages in the browser, so the should be loaded
-in the browser in their entirety.  On the other hand, the
+(and perhaps also the `game` table), are essentially static and are
+required by the browser to render the main pages, so they should be loaded
+in their entirety when the document is loaded.  On the other hand, the
 `ticket_user`, `ticket_lot` and `ticket` tables are subject to change
-and, if cached should be understood by the programmer to be possibly
+and if cached should be understood by the programmer to be possibly
 dirty and in need of refreshing or verification from the database.
 
 ### Column Classes
@@ -154,50 +154,6 @@ some questions:
 
 (Perhaps a diagram might make this clearer.  I don't have one yet :-)
 
-### Asynchrony Model
-
-My ws_rmi code was originally developed using a callback model and the
-remote object was assumed to require a callback argument which means
-that the stub did as well.  For a simple example, the stack class
-definition (in coffeescript) looks like this:
-
-```
-class Stack
-
-  # note that the object must have an id in order to
-  # register and operate with the rmi server
-  #
-  constructor: (@id) ->
-    @stack = []
-
-  push: (x, cb) =>
-    @stack.push(x)
-    console.log @stack
-    cb(true)
-
-  pop: (cb) =>
-    cb( @stack.pop())
-    console.log @stack
-
-
-class Stack_Stub extends WS_RMI_Stub
-  @add_stub('push')
-  @add_stub('pop')
-```
-
-Ideally the `ws_rmi` implementation should be flexible with respect to
-the async style of the remote object making it as easy as possible for
-the programmer.  Unlike the stack example the `db_orm` uses promises,
-so now would be a good time for me to have a look at re-implementing
-`ws_rmi` using promise as well.
-
-## To Do
-
-The code is still very much in flux. The design is still unsettled and
-evolving as I learn more about problems inherent in the goals of the
-project.  It's even fairly likely that when I'm done I'll start over
-with a more informed design and re-develop the whole thing.
-That said, I think the db_orm part is fairly settled.
 
 The SQL_Column class currently includes subclasses for SQL types:
 
@@ -254,6 +210,51 @@ but to much code in the table distrubs the aesthetics of the otherwise clean
 SQL style table definitions.  Arbitray methods can of course be added directly
 to the code produced by `db_orm`
 
+### Asynchrony Model
+
+My ws_rmi code was originally developed using a callback model and the
+remote object was assumed to require a callback argument which means
+that the stub did as well.  For a simple example, the stack class
+definition (in coffeescript) looks like this:
+
+```
+class Stack
+
+  # note that the object must have an id in order to
+  # register and operate with the rmi server
+  #
+  constructor: (@id) ->
+    @stack = []
+
+  push: (x, cb) =>
+    @stack.push(x)
+    console.log @stack
+    cb(true)
+
+  pop: (cb) =>
+    cb( @stack.pop())
+    console.log @stack
+
+
+class Stack_Stub extends WS_RMI_Stub
+  @add_stub('push')
+  @add_stub('pop')
+```
+
+Ideally the `ws_rmi` implementation should be flexible with respect to
+the async style of the remote object making it as easy as possible for
+the programmer.  Unlike the stack example the `db_orm` uses promises,
+so now would be a good time for me to have a look at re-implementing
+`ws_rmi` using promises as well.
+
+
+## To Do
+
+The code is still very much in flux. The design is still unsettled and
+evolving as I learn more about problems inherent in the goals of the
+project.  It's even fairly likely that when I'm done I'll start over
+with a more informed design and re-develop the whole thing.
+That said, I think the db_orm part is fairly settled.
 ## Finally
 
 The code is woefully short on comments and error handling.  Now that the 
