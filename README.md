@@ -1,29 +1,34 @@
-# DB WORM
+# `db_worm`
 
-DB WORM, short for database websocket object relational mapping, is an
-attempt to map a PostgreSQL database straight through to the browser
-by using pure Coffeescript, JSON data and remote method invocation
-over websockets.  This is a companion project to my ws_rmi (websocket
-remote method invocation) project.
-
-## db_orm
-
-The general idea is that the database table definitions are
-represented by subclasses of Table and Table_Row classes.  These
-subclassess are generated automatically by the db_orm portion of the
-project.  My goal is to abstract away the complexity of the process as
-possible allowing the table definitions to resemble SQL definitions as
-much as possible.
+Package `db_worm`, short for *database websocket object relational
+mapping*, is a tool which maps PostgreSQL databases to server-side
+objects and then on to browser side object stubs using pure
+Coffeescript, JSON data and my companion project `ws_rmi` which
+provides remote method invocation over websockets.
 
 I'm using my
 [Tickets-R-Us](https://github.com/alcarruth/fullstack-p3-item-catalog)
 database to exercise this code.  I developed the tickets project using
-a stack consisting of python, sql_alchemy, psycopg2 and flask.  It
-worked well but I felt that a pure coffeescript approach might allow
-for cleaner code.  I still do.  The code below is pure coffeescript
-but reads much like an SQL table definition.  It's easy for the user
-to write and it's easy (effortless, actually) for the db_orm code to
-parse.
+a stack consisting of `python`, `sql_alchemy`, `psycopg2` and `flask`.
+It worked well but I felt that I could do better using just
+coffeescript, JSON and `ws_rmi`.  (I still do :-)
+
+The implementation of `db_worm` is divided into two parts: `db_orm`
+and `db_rmi` which handle, obviously enough, the object relational
+mapping and the remote method invocation aspects, respectively.
+
+## `db_orm`
+
+The general idea is that the database table definitions are
+represented by subclasses of `Table` and `Table_Row` classes.  These
+subclassess are generated automatically by the `db_orm` portion of the
+project.  My goal is to abstract away the complexity of the process
+allowing the table definitions to resemble SQL definitions as much as
+possible.
+
+The code below is pure coffeescript but reads much like an SQL table
+definition.  It's easy for the user to write and it's easy
+(effortless, actually) for the db_orm code to parse.
 
 
 ```
@@ -98,38 +103,63 @@ table_defs  =
 
 ```
 
-## db_rmi
+## `db_rmi`
 
-The second half of the project is db_rmi which extends my ws_rmi
-classes with db specific subclasses so that the table and table_row
-classes created by db_orm are mapped to stub classes on the
-client/browser side.  Calling a method in the browser invokes the
-method in the server on corresponding remote object which is directly
-mapped to the database.
+The second half of the project is `db_rmi` which extends the `ws_rmi`
+classes with db specific sub-classes so that the `Table` and
+`Table_Row` classes created by `db_orm` are mapped to stub classes on
+the client/browser side.  Calling a method in the browser invokes the
+method in the server on the corresponding remote object on the server
+side which is directly mapped to the database.
 
-At this point this basically sorta works !-) I've expanded the ws_rmi
-code so that when a client first connects it has only an admin object
-stub.  This admin object can then provide specifications for the
-available table objects so that table stubs can be generated.  So far
-so good, but there are some issues.
+## Status
 
-There are decisions to be made about caching, asynchrony (callback,
+At this point this basically sorta works !-) I've expanded the
+`ws_rmi` code so that when a client first connects the only object
+stub it has available is an `admin` object stub.  The `admin` object
+then provides specifications for the available `Table` objects so that
+the appropriate `Table_Stubs` can be generated.  So far so good, but
+there are decisions to be made about caching, asynchrony (callback,
 promises, async/await) and where table methods for reference and
 back-reference columns are executed.  Many of these decisions are
-application specific.
+application specific and `db_worm` should provide a means for
+specifying a particular choice.
 
-With the tickets app, for example, the conference and team tables, and
-perhaps also the game table, will be loaded in the browser in their
-entirety.  They are essentially static and are needed to render basic
-pages in the browser.  The ticket_user, ticket_lot and ticket tables
-are subject to change and, if cached should be understood by the
-programmer to be possibly dirty and in need of refreshing or
-verification from the database.
+### Table Row Caching
 
-My ws_rmi code was originally developed using a callback model.  The
-remote object was assumed to require a callback and so the stub
-should as well.  For a simple example, the stack class definition
-(in coffeescript) looks like this:
+With the tickets app, for example, the `conference` and `team` tables,
+and perhaps also the `game` table, are essentially static and are
+needed to render basic pages in the browser, so the should be loaded
+in the browser in their entirety.  On the other hand, the
+`ticket_user`, `ticket_lot` and `ticket` tables are subject to change
+and, if cached should be understood by the programmer to be possibly
+dirty and in need of refreshing or verification from the database.
+
+### Column Classes
+
+The SQL_Columns are immediately available in the `Table_Row` object
+and can be produced immediately by the stub, but handling reference,
+back-reference and local_method columns requires a call to foreign
+table object and/or a call to the object's methods and this raises
+some questions:
+
+ - Should these calls be handled at the level of the object stub
+   *i.e.* calling a Table_Stub method?
+ - or should they invoke a remote method which then provides the
+   reference or local method functionality?
+ - and can this question be resolved generally as one or the other
+   possibilities?
+ - or are there perhaps situations which variably require one or the
+   other?
+
+(Perhaps a diagram might make this clearer.  I don't have one yet :-)
+
+### Asynchrony Model
+
+My ws_rmi code was originally developed using a callback model and the
+remote object was assumed to require a callback argument which means
+that the stub did as well.  For a simple example, the stack class
+definition (in coffeescript) looks like this:
 
 ```
 class Stack
@@ -155,29 +185,78 @@ class Stack_Stub extends WS_RMI_Stub
   @add_stub('pop')
 ```
 
-Ideally the ws_rmi implementation should be flexible with respect to the async style of the
-remote object to make using it as easy as possible.
+Ideally the `ws_rmi` implementation should be flexible with respect to
+the async style of the remote object making it as easy as possible for
+the programmer.  Unlike the stack example the `db_orm` uses promises,
+so now would be a good time for me to have a look at re-implementing
+`ws_rmi` using promise as well.
 
-## Status
+## To Do
 
-The code is still very much in flux since since the design is
-unsettled and evolving as I learn more about problems inherent in the
-achieving the goals of the project.  It's even fairly likely that when I'm
-done I'll start over with a more informed design and redevelop the whole thing.
+The code is still very much in flux. The design is still unsettled and
+evolving as I learn more about problems inherent in the goals of the
+project.  It's even fairly likely that when I'm done I'll start over
+with a more informed design and re-develop the whole thing.
+That said, I think the db_orm part is fairly settled.
 
-That said, I think the db_orm part is fairly settled but it has a number of
-issues:
+The SQL_Column class currently includes subclasses for SQL types:
 
-  - It is woefully short on comments
-  - ditto for error handling
-  - the SQL_Column class currently includes subclasses for SQL types
-    - Integer
-    - String
-    - Date
-    Adding others should be pretty easy, just a simple subclass for each type
-  - Three pseudo columns work well:
-    - Reference
-    - Back Reference
-    - Local Method which can handle arbitrary coffeescript definitions.
-    I don't know much about ORM generally so development has been driven
-    by the requirements of my tickets app, and these have been met.
+ - `Integer`
+ - `String`
+ - `Date`
+ 
+Adding others should be pretty easy by just a simple subclass for each type.
+Barring any difficulty I could perhaps just go down the list of SQL column
+types and add classes like the ones I have already:
+
+```
+class SQL_Column extends Column
+
+  constructor: (options) ->
+    super(options)
+    @sql_column = true
+        
+  __column_method: =>
+    name = @col_name
+    return () ->
+      @__obj[name]
+
+class SQL_String extends SQL_Column
+class SQL_Integer extends SQL_Column
+class SQL_Date extends SQL_Column
+
+```
+    
+I refer to columns which are not simple SQL datatypes as *pseudo-columns*.
+So far I have three pseudo-columns: 
+    
+#### Reference
+
+A `Reference Column` contains a key value which refers to a foreign
+table. Producing the data entails a call to the `find_by_id()` method
+of the foreign table object.
+
+#### Back_Reference
+
+A `Back_Reference Column` contains a (table\_name, key\_name)
+pair. Producing the data entails a call to the `find_where()` method
+of the foreign table object.
+
+#### Local_Method
+
+The `Local_Method Column` allows for the inclusion of arbitrary
+coffeescript/javascript code.  As an example the `team` definition has
+two reference columns, `home_games()` and `away_games()`, and one
+local method column which includes code to retrieve the home and away
+games, concatenate the results and sort the array by the game dates.
+So far I think this local method approach is suitable for short snippets
+but to much code in the table distrubs the aesthetics of the otherwise clean
+SQL style table definitions.  Arbitray methods can of course be added directly
+to the code produced by `db_orm`
+
+## Finally
+
+The code is woefully short on comments and error handling.  Now that the 
+design is beginning to settle I'll have a better idea of what to say
+in my comments and error messages so I've got no excuse except to get
+it done.
