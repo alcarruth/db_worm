@@ -135,25 +135,11 @@ in their entirety when the document is loaded.  On the other hand, the
 and if cached should be understood by the programmer to be possibly
 dirty and in need of refreshing or verification from the database.
 
-### Column Classes
+### SQL Column
 
-The SQL_Columns are immediately available in the `Table_Row` object
-and can be produced immediately by the stub, but handling reference,
-back-reference and local_method columns requires a call to foreign
-table object and/or a call to the object's methods and this raises
-some questions:
-
- - Should these calls be handled at the level of the object stub
-   *i.e.* calling a Table_Stub method?
- - or should they invoke a remote method which then provides the
-   reference or local method functionality?
- - and can this question be resolved generally as one or the other
-   possibilities?
- - or are there perhaps situations which variably require one or the
-   other?
-
-(Perhaps a diagram might make this clearer.  I don't have one yet :-)
-
+The SQL_Columns are those which correspond directly to columns in
+the SQL table.  These are immediately available in the `Table_Row` object
+and can be produced immediately by the stub.
 
 The SQL_Column class currently includes subclasses for SQL types:
 
@@ -182,9 +168,12 @@ class SQL_Integer extends SQL_Column
 class SQL_Date extends SQL_Column
 
 ```
-    
-I refer to columns which are not simple SQL datatypes as *pseudo-columns*.
-So far I have three pseudo-columns: 
+### Pseudo-Columns
+
+I refer to columns which are not simple SQL datatypes as
+*pseudo-columns*.  So far I have three pseudo-columns: `Reference`,
+`Back_Reference` and `Local_Method`.
+
     
 #### Reference
 
@@ -209,6 +198,21 @@ So far I think this local method approach is suitable for short snippets
 but to much code in the table distrubs the aesthetics of the otherwise clean
 SQL style table definitions.  Arbitray methods can of course be added directly
 to the code produced by `db_orm`
+
+`Reference`, `Back_Reference` and `Local_Method` each require a call
+to a foreign table object and/or a call to the object's methods, and
+this raises some questions:
+
+ - Should these calls be handled at the level of the object stub
+   *i.e.* calling a Table_Stub method?
+ - or should they invoke a remote method which then provides the
+   reference or local method functionality?
+ - and can this question be resolved generally as one or the other
+   possibilities?
+ - or are there perhaps situations which variably require one or the
+   other?
+
+(Perhaps a diagram might make this clearer.  I don't have one yet :-)
 
 ### Asynchrony Model
 
@@ -235,7 +239,6 @@ class Stack
     cb( @stack.pop())
     console.log @stack
 
-
 class Stack_Stub extends WS_RMI_Stub
   @add_stub('push')
   @add_stub('pop')
@@ -255,9 +258,8 @@ evolving as I learn more about problems inherent in the goals of the
 project.  It's even fairly likely that when I'm done I'll start over
 with a more informed design and re-develop the whole thing.
 That said, I think the db_orm part is fairly settled.
-## Finally
 
-The code is woefully short on comments and error handling.  Now that the 
-design is beginning to settle I'll have a better idea of what to say
-in my comments and error messages so I've got no excuse except to get
-it done.
+Perhaps most pressing is the fact that the code is woefully short on
+comments and error handling.  Now that the design is beginning to
+settle I'll have a better idea of what to say in my comments and error
+messages so I've got no excuse except to get it done.
