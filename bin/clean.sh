@@ -1,5 +1,5 @@
 #!/bin/sh
 
 rm -rf js
-mkdir js
+mkdir -p js
 

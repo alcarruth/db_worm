@@ -2,7 +2,7 @@
   "name": "db_worm",
   "version": "1.0.0",
   "description": "A database web-object relational mapper",
-  "main": "index.js",
+  "main": "index_dev.js",
   "scripts": {
     "test": "test"
   },
@@ -18,7 +18,8 @@
   ],
   "author": "Al Carruth",
   "license": "MIT",
-  "devDependencies": {
-    "coffeescript": "^2.4.1"
+  "dependencies": {
+    "coffeescript": "^2.4.1",
+    "ws_rmi": "file:../ws_rmi"
   }
 }
