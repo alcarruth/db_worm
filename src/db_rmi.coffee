@@ -9,8 +9,9 @@ ws_rmi = require('ws_rmi')
 class DB_RMI_Server extends ws_rmi.Server
   constructor: (db, options) ->
     objects = []
-    for table in db.tables
+    for table in @db.tables
       name = table.__name
+      console.log name
       method_names = table.__method_names
       objects.push(new ws_rmi.Object(name, table, method_names))
     super(options, objects)
