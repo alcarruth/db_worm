@@ -20,3 +20,6 @@ class DB_RMI_Client extends ws_rmi.Client
   constructor: (options) ->
     super(options, [])
 
+
+exports.DB_RMI_Client = DB_RMI_Client
+exports.DB_RMI_Server = DB_RMI_Server
