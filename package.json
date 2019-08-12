@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "/opt/git/db_worm"
+    "url": "git@github.com:alcarruth/db_worm.git"
   },
   "keywords": [
     "database",
@@ -20,6 +20,6 @@
   "license": "MIT",
   "dependencies": {
     "coffeescript": "^2.4.1",
-    "ws_rmi": "file:../ws_rmi"
+    "ws_rmi": "git://github.com/alcarruth/ws_rmi#develop"
   }
 }

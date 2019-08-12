@@ -5,6 +5,22 @@
 # 
 
 { Client, Pool } = require('pg')
+ws_rmi = require('ws_rmi')
+
+class DB_RMI_Server extends ws_rmi.Server
+  constructor: (db, options) ->
+    objects = []
+    for table in db.tables
+      name = table.__name
+      method_names = table.__method_names
+      objects.push(new ws_rmi.Object(name, table, method_names))
+    super(options, objects)
+
+
+class DB_RMI_Client extends ws_rmi.Client
+  constructor: (options) ->
+    super(options, [])
+
 
 #------------------------------------------------------------------------------------
 #
@@ -132,6 +148,12 @@ class Table
   constructor: (spec) ->
     @__db = spec.db
     @__name = spec.name
+    @__method_names = [
+      'find_by_id',
+      'find_by_primary_key',
+      'find_all',
+      'find_where'
+      ]
     @__primary_key = spec.primary_key || 'id'
     @__row_methods = {}
     for name, column of spec.columns
@@ -146,6 +168,12 @@ class Table
         super(table, obj)
         for name, method of table.__row_methods
           this[name] = method #.bind(this)
+
+  obj_spec: =>
+    name: @__name
+    obj: this
+    method_names: @__method_names
+
  
   # TODO: insert into DB
   insert: (obj) =>
@@ -271,4 +299,9 @@ class DB_ORM
       primary_key: primary_key || 'id'
       columns: columns
 
+
+
+
 exports.DB_ORM = DB_ORM
+exports.DB_RMI_Server = DB_RMI_Server
+exports.DB_RMI_Client = DB_RMI_Client
