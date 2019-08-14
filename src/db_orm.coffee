@@ -4,25 +4,10 @@
 #  db_orm.coffee
 # 
 
-{ Client, Pool } = require('pg')
-ws_rmi = require('ws_rmi')
+if not window?
+  { Client, Pool } = require('pg')
 
-class DB_RMI_Server extends ws_rmi.Server
-  constructor: (db, options) ->
-    objects = []
-    for table in db.tables
-      name = table.__name
-      method_names = table.__method_names
-      objects.push(new ws_rmi.Object(name, table, method_names))
-    super(options, objects)
-
-
-class DB_RMI_Client extends ws_rmi.Client
-  constructor: (options) ->
-    super(options, [])
-
-
-#------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 #
 #  Column definitions
 #
@@ -103,10 +88,8 @@ class SQL_String extends SQL_Column
 class SQL_Integer extends SQL_Column
 class SQL_Date extends SQL_Column
 
-
-
   
-#------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # CLASS TABLE_ROW
 # 
 # Class Table_Row is the companion to class Table (below) A Table_Row
@@ -138,7 +121,8 @@ class Table_Row
     # some suitable default
 
 
-#------------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
 # CLASS TABLE
 # 
 # A Table corresponds to a table in the PostgreSQL DB.
@@ -169,12 +153,6 @@ class Table
         for name, method of table.__row_methods
           this[name] = method #.bind(this)
 
-  obj_spec: =>
-    name: @__name
-    obj: this
-    method_names: @__method_names
-
- 
   # TODO: insert into DB
   insert: (obj) =>
     cols = (k for k,v of @__sql_columns)
@@ -184,7 +162,7 @@ class Table
     try
      # db.query(text, values)
     catch error
-      console.log(error)
+      console.log(error.message)
     
   __add_row: (obj) => 
     row = new @__Row_Class(obj)
@@ -195,54 +173,67 @@ class Table
       text = "select * from #{@__name}"
       values = []
       rows = @__db.query(text, values)
-      #return (new @__Row_Class(row) for row in await rows)
-      return rows
+      return (new @__Row_Class(row) for row in await rows)
     catch error
-      console.log(error.msg)
-      console.log("Query failed in #{@__name}.find_all()")
-      console.log("  text: #{text}\n  values: #{JSON.stringify(values)}")
+      console.log(error.message)
 
   find_by_id: (id) =>
-    try
-      text = "select * from #{@__name} where id = $1 "
-      values = [id]
-      rows = @__db.query(text, values)
-      #return new @__Row_Class((await rows)[0])
-      return rows[0]
-    catch error
-      console.log(error.msg)
-      console.log("Query failed in #{@__name}.find_by_id()")
-      console.log("  text: #{text}\n  values: #{JSON.stringify(values)}")
+    @find_one('id', id)
 
   find_by_primary_key: (val) =>
-    try
-      text = "select * from #{@__name} where #{@__primary_key} = $1 "
-      values = [val]
-      rows = @__db.query(text, values)[0]
-      return new @__Row_Class((await rows)[0])
-    catch error
-      console.log(error.msg)
-      console.log("Query failed in #{@__name}.find_by_primary_key()")
-      console.log("  text: #{text}\n  values: #{JSON.stringify(values)}")
+    @find_one(@__primary_key, val)
 
+  find_one: (col, val) =>
+    (await @find_where(col, val))[0]
+  
   find_where: (col, val) =>
     try
       text = "select * from #{@__name} where #{col} = $1 "
       values = [val]
       rows = await @__db.query(text, values)
-      #return (new @__Row_Class(row) for row in rows)
-      return rows
+      return (new @__Row_Class(row) for row in await rows)
     catch error
-      console.log(error)
-      console.log("\n\nQuery failed in #{@__name}.find_where()")
-      console.log("  text: #{text}\n  values: #{JSON.stringify(values)}")
+      console.log(error.message)
 
       
   __remove_row: (id) =>
     delete @__rows[id]
 
 
-#------------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
+# CLASS DB_Object
+#
+
+class DB_Object
+
+  constructor: (@pg_options, @db_schema) ->
+    @pool = new Pool(@pg_options)
+
+  get_db_schema: =>
+    return new Promise((resolve, reject) =>
+      try
+        resolve(@db_schema)
+      catch
+        reject("Could not get @db_schema."))
+      
+    
+  query: (text, values) =>
+
+    try
+      client = await @pool.connect().catch ->
+        throw new Error("Failed to connect.")
+      result = await client.query(text, values).catch ->
+        throw new Error("Failed to query.")
+      client.release()
+      return result.rows
+
+    catch error
+      msg = "Query failed.\n text: \"#{text}\"\n values: [#{values}]\n"
+      throw new Error(msg)
+
+
+#-------------------------------------------------------------------------------
 # CLASS DB_ORM
 # 
 class DB_ORM
@@ -256,28 +247,15 @@ class DB_ORM
     back_reference: Back_Reference
     local_method: Local_Method
 
-  constructor: (@pg_options, @table_defs) ->
-    @pool = new Pool(@pg_options)
-    @init_tables(@table_defs)
+  constructor: (@db_obj) ->
   
   query: (text, values) =>
+    @db_obj.query(text, values)
 
-    try
-      client = await @pool.connect().catch ->
-        throw new Error("Failed to connect.")
-      result = await client.query(text, values).catch ->
-        throw new Error("Failed to query.")
-      client.release()
-      return result.rows
-
-    catch error
-      console.log error
-      msg = "Query failed.\n text: \"#{text}\"\n values: [#{values}]\n"
-      throw new Error(msg)
-
-  init_tables: (table_defs) =>
+  init_tables: =>
+    @db_schema = @db_obj.get_db_schema()
     @tables = {}
-    @add_table(name, def) for name, def of table_defs
+    @add_table(name, def) for name, def of await @db_schema
 
   add_table: (table_name, table_def) =>
     columns = {}
@@ -300,8 +278,6 @@ class DB_ORM
       columns: columns
 
 
-
-
-exports.DB_ORM = DB_ORM
-exports.DB_RMI_Server = DB_RMI_Server
-exports.DB_RMI_Client = DB_RMI_Client
+if not window?
+  exports.DB_ORM = DB_ORM
+  exports.DB_Object = DB_Object

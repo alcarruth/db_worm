@@ -2,9 +2,13 @@
 
 require('coffeescript/register')
 
-db_orm = require('./src/db_orm')
-db_rmi = require('./src/db_rmi')
+DB_ORM = require('./src/db_orm').DB_ORM
+DB_Object = require('./src/db_orm').DB_Object
+DB_RMI_Server = require('./src/db_rmi_server').DB_RMI_Server
+DB_RMI_Client = require('./src/db_rmi_client').DB_RMI_Client
 
-exports.DB_ORM = db_orm.DB_ORM
-exports.DB_RMI_Server = db_rmi.DB_RMI_Server 
-exports.DB_RMI_Client = db_rmi.DB_RMI_Client
+exports.DB_ORM = DB_ORM
+exports.DB_Object = DB_Object
+
+exports.DB_RMI_Server = DB_RMI_Server 
+exports.DB_RMI_Client = DB_RMI_Client
