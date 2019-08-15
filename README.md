@@ -1,9 +1,9 @@
-# `db_worm`
+# `web-worm`
 
-Package `db_worm`, short for *database websocket object relational
+Package `web-worm`, short for *database websocket object relational
 mapping*, is a tool which maps PostgreSQL databases to server-side
 objects and then on to browser side object stubs using pure
-Coffeescript, JSON data and my companion project `ws_rmi` which
+Coffeescript, JSON data and my companion project `ws-rmi` which
 provides remote method invocation over websockets.
 
 I'm using my
@@ -11,9 +11,9 @@ I'm using my
 database to exercise this code.  I developed the tickets project using
 a stack consisting of `python`, `sql_alchemy`, `psycopg2` and `flask`.
 It worked well but I felt that I could do better using just
-coffeescript, JSON and `ws_rmi`.  (I still do :-)
+coffeescript, JSON and `ws-rmi`.  (I still do :-)
 
-The implementation of `db_worm` is divided into two parts: `db_orm`
+The implementation of `web-worm` is divided into two parts: `db_orm`
 and `db_rmi` which handle, obviously enough, the object relational
 mapping and the remote method invocation aspects, respectively.
 
@@ -105,7 +105,7 @@ table_defs  =
 
 ## `db_rmi`
 
-The second half of the project is `db_rmi` which extends the `ws_rmi`
+The second half of the project is `db_rmi` which extends the `ws-rmi`
 classes with db specific sub-classes so that the `Table` and
 `Table_Row` classes created by `db_orm` are mapped to stub classes on
 the client/browser side.  Calling a method in the browser invokes the
@@ -115,14 +115,14 @@ side which is directly mapped to the database.
 ## Status
 
 At this point this basically sorta works !-) I've expanded the
-`ws_rmi` code so that when a client first connects the only object
+`ws-rmi` code so that when a client first connects the only object
 stub it has available is an `admin` object stub.  The `admin` object
 then provides specifications for the available `Table` objects so that
 the appropriate `Table_Stubs` can be generated.  So far so good, but
 there are decisions to be made about caching, asynchrony (callback,
 promises, async/await) and where table methods for reference and
 back-reference columns are executed.  Many of these decisions are
-application specific and `db_worm` should provide a means for
+application specific and `web-worm` should provide a means for
 specifying a particular choice.
 
 ### Table Row Caching
@@ -216,7 +216,7 @@ this raises some questions:
 
 ### Asynchrony Model
 
-My ws_rmi code was originally developed using a callback model and the
+My ws-rmi code was originally developed using a callback model and the
 remote object was assumed to require a callback argument which means
 that the stub did as well.  For a simple example, the stack class
 definition (in coffeescript) looks like this:
@@ -239,16 +239,16 @@ class Stack
     cb( @stack.pop())
     console.log @stack
 
-class Stack_Stub extends WS_RMI_Stub
+class Stack_Stub extends WS-RMI_Stub
   @add_stub('push')
   @add_stub('pop')
 ```
 
-Ideally the `ws_rmi` implementation should be flexible with respect to
+Ideally the `ws-rmi` implementation should be flexible with respect to
 the async style of the remote object making it as easy as possible for
 the programmer.  Unlike the stack example the `db_orm` uses promises,
 so now would be a good time for me to have a look at re-implementing
-`ws_rmi` using promises as well.
+`ws-rmi` using promises as well.
 
 
 ## To Do
