@@ -1,14 +1,14 @@
 #!/usr/bin/env coffee
 # -*- coding: utf-8 -*-
 #
-#  db_orm.coffee
+#  db_rmi_server.coffee
 # 
 
-if not window?
-  ws_rmi = require('ws_rmi')
-  WS_RMI_Server = ws_rmi.Server
-  WS_RMI_Object = ws_rmi.Object
-  { DB_ORM, DB_Object } = require('./db_orm')
+ws_rmi = require('ws-rmi')
+WS_RMI_Server = ws_rmi.Server
+WS_RMI_Object = ws_rmi.Object
+# { DB_ORM } = require('./db_orm')
+{ DB_Object } = require('./db_obj')
 
 
 class DB_RMI_Object extends WS_RMI_Object
@@ -24,5 +24,4 @@ class DB_RMI_Server extends WS_RMI_Server
     super(options, [db_rmi_obj])
 
 
-if not window?
-  exports.DB_RMI_Server = DB_RMI_Server
+exports.DB_RMI_Server = DB_RMI_Server

@@ -4,11 +4,10 @@
 #  db_rmi_client.coffee
 # 
 
-if not window?
-  ws_rmi = require('ws_rmi')
-  WS_RMI_Connection = ws_rmi.Connection
-  WS_RMI_Client = ws_rmi.Client
-  { DB_ORM, DB_Object } = require('./db_orm')
+ws_rmi = require('ws-rmi')
+WS_RMI_Connection = ws_rmi.Connection
+WS_RMI_Client = ws_rmi.Client
+{ DB_ORM } = require('./db_orm')
 
 
 class DB_RMI_Connection extends WS_RMI_Connection
@@ -23,6 +22,5 @@ class DB_RMI_Client extends WS_RMI_Client
     super(options, [], DB_RMI_Connection)
 
 
-if not window?
-  exports.DB_RMI_Client = DB_RMI_Client
+exports.DB_RMI_Client = DB_RMI_Client
   
