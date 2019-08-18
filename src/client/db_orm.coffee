@@ -213,6 +213,7 @@ class DB_ORM
     local_method: Local_Method
 
   constructor: (@db_obj) ->
+    @init_tables()
   
   query: (text, values) =>
     @db_obj.query(text, values)

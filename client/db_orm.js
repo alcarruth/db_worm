@@ -324,6 +324,7 @@
         this.init_tables = this.init_tables.bind(this);
         this.add_table = this.add_table.bind(this);
         this.db_obj = db_obj;
+        this.init_tables();
       }
 
       query(text, values) {

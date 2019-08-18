@@ -19,25 +19,23 @@
   DB_RMI_Connection = class DB_RMI_Connection extends WS_RMI_Connection {
     constructor() {
       super(...arguments);
-      this.init_stubs = this.init_stubs.bind(this);
       this.init_db = this.init_db.bind(this);
-    }
-
-    init_stubs() {
-      boundMethodCheck(this, DB_RMI_Connection);
-      return super.init_stubs().then(this.init_db);
     }
 
     init_db() {
       boundMethodCheck(this, DB_RMI_Connection);
-      return this.db = new DB_ORM(this.stubs.db_obj);
+      return this.init_stubs().then(() => {
+        this.db = new DB_ORM(this.stubs.db_obj);
+        return this.db;
+      });
     }
 
   };
 
   DB_RMI_Client = class DB_RMI_Client extends WS_RMI_Client {
-    constructor(options) {
-      super(options, [], DB_RMI_Connection);
+    constructor(options, log_level) {
+      console.log("DB_RMI_Client");
+      super(options, [], DB_RMI_Connection, log_level);
     }
 
   };
