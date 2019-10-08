@@ -5,18 +5,14 @@
 
   //  db_rmi_server.coffee
 
-  var DB_Object, DB_RMI_Object, DB_RMI_Server, WS_RMI_Object, WS_RMI_Server, ws_rmi;
+  var DB_Object, DB_RMI_Object, DB_RMI_Server, ws_rmi;
 
   ws_rmi = require('ws-rmi');
-
-  WS_RMI_Server = ws_rmi.Server;
-
-  WS_RMI_Object = ws_rmi.Object;
 
   // { DB_ORM } = require('./db_orm')
   ({DB_Object} = require('./db_obj'));
 
-  DB_RMI_Object = class DB_RMI_Object extends WS_RMI_Object {
+  DB_RMI_Object = class DB_RMI_Object extends ws_rmi.Object {
     constructor(pg_options, db_schema, log_level) {
       var db_obj, method_names;
       db_obj = new DB_Object(pg_options, db_schema);
@@ -26,7 +22,7 @@
 
   };
 
-  DB_RMI_Server = class DB_RMI_Server extends WS_RMI_Server {
+  DB_RMI_Server = class DB_RMI_Server extends ws_rmi.Server {
     constructor(options, pg_options, db_schema) {
       var db_rmi_obj;
       db_rmi_obj = new DB_RMI_Object(pg_options, db_schema);

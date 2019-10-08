@@ -5,18 +5,14 @@
 
   //  db_rmi_client.coffee
 
-  var DB_ORM, DB_RMI_Client, DB_RMI_Connection, WS_RMI_Client, WS_RMI_Connection, ws_rmi,
+  var DB_ORM, DB_RMI_Client, DB_RMI_Connection, ws_rmi,
     boundMethodCheck = function(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new Error('Bound instance method accessed before binding'); } };
 
   ws_rmi = require('ws-rmi');
 
-  WS_RMI_Connection = ws_rmi.Connection;
-
-  WS_RMI_Client = ws_rmi.Client;
-
   ({DB_ORM} = require('./db_orm'));
 
-  DB_RMI_Connection = class DB_RMI_Connection extends WS_RMI_Connection {
+  DB_RMI_Connection = class DB_RMI_Connection extends ws_rmi.Connection {
     constructor() {
       super(...arguments);
       this.init_db = this.init_db.bind(this);
@@ -32,10 +28,12 @@
 
   };
 
-  DB_RMI_Client = class DB_RMI_Client extends WS_RMI_Client {
-    constructor(options, log_level) {
+  DB_RMI_Client = class DB_RMI_Client extends ws_rmi.Client {
+    constructor(options) {
+      var objects;
       console.log("DB_RMI_Client");
-      super(options, [], DB_RMI_Connection, log_level);
+      objects = [];
+      super(objects, options, DB_RMI_Connection);
     }
 
   };

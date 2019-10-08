@@ -5,12 +5,10 @@
 # 
 
 ws_rmi = require('ws-rmi')
-WS_RMI_Connection = ws_rmi.Connection
-WS_RMI_Client = ws_rmi.Client
 { DB_ORM } = require('./db_orm')
 
 
-class DB_RMI_Connection extends WS_RMI_Connection
+class DB_RMI_Connection extends ws_rmi.Connection
 
   init_db: =>
     @init_stubs()
@@ -19,10 +17,11 @@ class DB_RMI_Connection extends WS_RMI_Connection
       return @db)
 
   
-class DB_RMI_Client extends WS_RMI_Client
-  constructor: (options, log_level) ->
+class DB_RMI_Client extends ws_rmi.Client
+  constructor: (options) ->
     console.log("DB_RMI_Client")
-    super(options, [], DB_RMI_Connection, log_level)
+    objects = []
+    super(objects, options, DB_RMI_Connection)
 
 
 exports.DB_RMI_Client = DB_RMI_Client
