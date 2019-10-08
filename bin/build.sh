@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#root_dir=/var/www/git/projects/web-worm
-root_dir=/home/carruth/git/web-worm
+root_dir=/var/www/git/projects/web-worm
+#root_dir=/home/carruth/git/web-worm
 
 
 function build_client {

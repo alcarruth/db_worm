@@ -13,7 +13,7 @@
   //  which returns a method to be added to the @__Row_Class()
   //  definition in class Table, (q.v.)  It's convoluted but the
   //  end result is that each Table has a corresponding Row_Class
-  //  method that is used to to create new Table_Rows from simple
+  //  method that is used to to create new Table_Rows from a simple
   //  Javascript object such as that returned by a db query.
 
   var Back_Reference, Column, DB_ORM, Local_Method, Reference, SQL_Column, SQL_Date, SQL_Integer, SQL_String, Table, Table_Row,
