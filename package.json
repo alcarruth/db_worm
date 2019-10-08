@@ -21,6 +21,6 @@
   "dependencies": {
     "coffeescript": "^2.4.1",
     "pg": "^7.12.1",
-    "ws-rmi": "file:/var/www/git/projects/ws-rmi"
+    "ws-rmi": "file:../ws-rmi"
   }
 }
