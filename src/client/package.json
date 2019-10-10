@@ -20,6 +20,6 @@
   "license": "MIT",
   "dependencies": {
     "coffeescript": "^2.4.1",
-    "ws-rmi": "file:../../ws-rmi"
+    "ws-rmi": "file:../../../ws-rmi"
   }
 }

@@ -1,12 +1,14 @@
 #!/usr/bin/env node
+//
+// package web-worm
+// index.js
+//
 
-exports.client = {
-  DB_ORM: require('./lib/db_orm').DB_ORM,
-  DB_RMI_Client: require('./lib/db_rmi_client').DB_RMI_Client
-};
+exports.client = require('./lib/client')
+exports.server = require('./lib/server')
 
-exports.server = {
-  DB_Object: require('./lib/db_obj').DB_Object,
-  DB_RMI_Server: require('./lib/db_rmi_server').DB_RMI_Server 
-};
-
+lib = require('./lib')
+exports.DB_ORM = lib.DB_ORM
+exports.DB_RMI_Client = lib/.DB_RMI_Client
+exports.DB_Object = lib.DB_Object
+exports.DB_RMI_Server = lib.DB_RMI_Server

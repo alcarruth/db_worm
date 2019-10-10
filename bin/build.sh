@@ -1,47 +1,56 @@
 #!/bin/bash
 
 root_dir=/var/www/git/projects/web-worm
-#root_dir=/home/carruth/git/web-worm
+build_dir="${root_dir}/lib"
+src_dir="${root_dir}/src"
 
 
 function build_client {
     
-    pushd ${root_dir}
+    pushd ${build_dir}
     rm -rf ./client
     mkdir -p ./client
+    popd
     
-    pushd ./src/client
-    coffee -c -o ${root_dir}/client db_orm.coffee db_rmi_client.coffee
-    cp index.js package.json ${root_dir}/client
+    pushd ${src_dir}/client
+    coffee -c -o ${build_dir}/client db_orm.coffee db_rmi_client.coffee index.coffee
+    cp package.json ${build_dir}/client
     popd
 
-    pushd client
+    pushd ${build_dir}/client
     rm -rf node_modules
     npm i
     popd
 
-    popd
 }
 
 function build_server {
     
-    pushd ${root_dir}
+    pushd ${build_dir}
     rm -rf ./server
     mkdir -p ./server
+    popd
     
-    pushd ./src/server
-    coffee -c -o ${root_dir}/server db_obj.coffee db_rmi_server.coffee
-    cp index.js package.json ${root_dir}/server
+    pushd ${src_dir}/server
+    coffee -c -o ${build_dir}/server db_obj.coffee db_rmi_server.coffee index.coffee
+    cp package.json ${build_dir}/server
     popd
 
-    pushd server
+    pushd ${build_dir}/server
     rm -rf node_modules
     npm i
     popd
-
-    popd
 }
 
+function build {
 
-build_client
-build_server
+    rm -rf ${build_dir}
+    mkdir -p ${build_dir}
+
+    coffee -c -o ${build_dir} ${src_dir}/index.coffee
+
+    build_client
+    build_server
+}
+
+build

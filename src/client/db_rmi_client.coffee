@@ -19,7 +19,6 @@ class DB_RMI_Connection extends ws_rmi.Connection
   
 class DB_RMI_Client extends ws_rmi.Client
   constructor: (options) ->
-    console.log("DB_RMI_Client")
     objects = []
     super(objects, options, DB_RMI_Connection)
 

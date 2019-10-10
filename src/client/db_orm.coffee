@@ -33,7 +33,8 @@ class Local_Method extends Column
   
   constructor: (spec) ->
     super(spec)
-    { @method } = @options
+    #{ @method } = @options
+    { @method } = spec
     @sql_column = false
 
   __column_method: =>
