@@ -6,13 +6,13 @@ lib_dir="${root_dir}/lib"
 src_dir="${root_dir}/src"
 
 function build {
-    
-    pushd ${root_dir}
+    echo "building web-worm/lib"
+    pushd ${root_dir} > /dev/null
     rm -rf ${lib_dir}
     mkdir -p ${lib_dir}
-    coffee -c -o ${lib_dir} ${src_dir}/lib/*.coffee
-    coffee -c -o ${root_dir} ${src_dir}/*.coffee
-    popd
+    coffee -c -o ${lib_dir} ${src_dir}/lib/*.coffee > /dev/null
+    coffee -c -o ${root_dir} ${src_dir}/*.coffee > /dev/null
+    popd > /dev/null
 }
 
 build
