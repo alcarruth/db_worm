@@ -5,14 +5,14 @@
 
 pg = require('pg')
 
-#-------------------------------------------------------------------------------
+#-----------------------------------------------------------------------
 # CLASS DB_Object
 #
 
 # class DB_Object()
 # 
-# A DB_Object takes as an arg pg_options and provides a method
-# to query the database.  This PostgreSQL specific.
+# A DB_Object takes as an arg pg_options and provides a method to
+# query the database.  This PostgreSQL specific.
 # 
 class DB_Object
 

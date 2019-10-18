@@ -22,7 +22,7 @@ ws_rmi = require('ws-rmi')
 # and the appropriate DB_Connection_Class which extends
 # WS_RMI_Connection is produced at that time.
 # 
-create_Connection_Class = (db_schema) ->
+create_DB_RMI_Connection = (db_schema) ->
   class DB_RMI_Connection extends ws_rmi.Connection
     constructor: (owner, ws, options) ->
       super(owner, ws, options)
@@ -41,7 +41,7 @@ create_Connection_Class = (db_schema) ->
 class DB_RMI_Client extends ws_rmi.Client
   constructor: (db_schema, options) ->
     objects = []
-    DB_RMI_Connection = create_Connection_Class(db_schema)
+    DB_RMI_Connection = create_DB_RMI_Connection(db_schema)
     super(objects, options, DB_RMI_Connection)
 
 
