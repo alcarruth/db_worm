@@ -4,6 +4,7 @@
   "description": "A database web-object relational mapper",
   "main": "index.js",
   "scripts": {
+    "install": "./bin/build.sh",
     "test": "test"
   },
   "repository": {
