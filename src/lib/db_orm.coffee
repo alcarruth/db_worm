@@ -230,14 +230,13 @@ class Table
   # Add a row object.  Note that this does not insert the new
   # row into the DB.
   # 
-  __add_row: (obj) => 
-    row = new @__Row_Class(obj)
+  add_row: (row) => 
     @__rows[row.get_primary_key()] = row
       
   # Delete a row object.  Note that this does not delete the row from
   # the DB.
   # 
-  __remove_row: (id) =>
+  remove_row: (id) =>
     delete @__rows[id]
 
 
