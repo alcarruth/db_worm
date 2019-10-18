@@ -1,6 +1,7 @@
 #!/bin/bash
 
-root_dir=/var/www/git/projects/web-worm
+#root_dir=/var/www/git/projects/web-worm
+root_dir="."
 lib_dir="${root_dir}/lib"
 src_dir="${root_dir}/src"
 
