@@ -230,8 +230,9 @@ class Table
   # Add a row object.  Note that this does not insert the new
   # row into the DB.
   # 
-  add_row: (row) => 
-    @__rows[row.get_primary_key()] = row
+  add_row: (row) =>
+    key = row[@__primary_key]()
+    @__rows[key] = row
       
   # Delete a row object.  Note that this does not delete the row from
   # the DB.
