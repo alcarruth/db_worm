@@ -5,6 +5,7 @@
 
 ws_rmi = require('ws-rmi')
 { DB_Object } = require('./db_obj')
+{ DB_ORM } = require('./db_orm')
 
 
 # class DB_RMI_Object()
@@ -15,8 +16,8 @@ ws_rmi = require('ws-rmi')
 # not exported.
 # 
 class DB_RMI_Object extends ws_rmi.Object
-  constructor: (db_schema, pg_options, options) ->
-    db_obj = new DB_Object(pg_options, db_schema)
+  constructor: (pg_options, options) ->
+    db_obj = new DB_Object(pg_options)
     method_names = ['query']
     super('db_obj', db_obj, method_names, options)
 
@@ -28,9 +29,10 @@ class DB_RMI_Object extends ws_rmi.Object
 # 
 class DB_RMI_Server extends ws_rmi.Server
   constructor: (db_schema, pg_options, options) ->
-    db_rmi_obj = new DB_RMI_Object(db_schema, pg_options, options)
+    db_rmi_obj = new DB_RMI_Object(pg_options, options)
     objects = [db_rmi_obj]
     super(objects, options)
+    @db = new DB_ORM(db_rmi_obj, db_schema)
 
 
 exports.DB_RMI_Server = DB_RMI_Server
