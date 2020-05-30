@@ -27,7 +27,8 @@ create_DB_RMI_Connection = (db_schema) ->
     constructor: (owner, ws, options) ->
       super(owner, ws, options)
       @db_schema = db_schema
-    init: =>
+    init_db: =>
+      await @init_stubs()
       @db = new DB_ORM(@stubs.db_obj, @db_schema)
 
 
