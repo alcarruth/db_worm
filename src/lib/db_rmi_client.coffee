@@ -27,10 +27,8 @@ create_DB_RMI_Connection = (db_schema) ->
     constructor: (owner, ws, options) ->
       super(owner, ws, options)
       @db_schema = db_schema
-      @init_stubs()
-      .then(()=>
-        @db = new DB_ORM(@stubs.db_obj, @db_schema)
-        return @db)
+    init: =>
+      @db = new DB_ORM(@stubs.db_obj, @db_schema)
 
 
 # class DB_RMI_Client
