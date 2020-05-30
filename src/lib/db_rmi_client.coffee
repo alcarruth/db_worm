@@ -23,10 +23,13 @@ ws_rmi = require('ws-rmi')
 # WS_RMI_Connection is produced at that time.
 # 
 create_DB_RMI_Connection = (db_schema) ->
+
   class DB_RMI_Connection extends ws_rmi.Connection
+
     constructor: (owner, ws, options) ->
       super(owner, ws, options)
       @db_schema = db_schema
+
     init_db: =>
       await @init_stubs()
       @db = new DB_ORM(@stubs.db_obj, @db_schema)
@@ -38,10 +41,15 @@ create_DB_RMI_Connection = (db_schema) ->
 # which will use it to wrap the websocket upon connecting.
 # 
 class DB_RMI_Client extends ws_rmi.Client
+
   constructor: (db_schema, options) ->
     objects = []
     DB_RMI_Connection = create_DB_RMI_Connection(db_schema)
     super(objects, options, DB_RMI_Connection)
+
+  connect: =>
+    await super.connect()
+    @connection.init_db()
 
 
 exports.DB_RMI_Client = DB_RMI_Client
