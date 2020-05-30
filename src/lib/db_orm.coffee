@@ -221,7 +221,7 @@ class Table
     cols = (k for k,v of @__sql_columns)
     text = "insert into #{@__name}(#{cols.join(',')})"
     values = (obj[col] for col in cols)
-    console.log("Trying query:\n  text: \"#{text}\"\n  values: [ #{values} ]\n")
+    #console.log("Trying query:\n  text: \"#{text}\"\n  values: [ #{values} ]\n")
     try
      # db.query(text, values)
     catch error
