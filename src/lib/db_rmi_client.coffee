@@ -1,6 +1,7 @@
 #!/usr/bin/env coffee
 #
-#  web-worm/src/client/db_rmi_client.coffee
+# file: /src/lib/db_rmi_client.coffee
+# package: web-worm
 # 
 
 ws_rmi = require('ws-rmi')

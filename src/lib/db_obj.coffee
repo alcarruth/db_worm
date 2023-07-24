@@ -1,6 +1,7 @@
 #!/usr/bin/env coffee
 #
-#  web-worm/src/server/db_obj.coffee
+# file: /src/lib/db_obj.coffee
+# package: web-worm
 # 
 
 pg = require('pg')
