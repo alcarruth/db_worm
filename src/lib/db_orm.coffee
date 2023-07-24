@@ -1,6 +1,7 @@
 #!/usr/bin/env coffee
 #
-#  web-worm/src/client/db_orm.coffee
+# file: /src/lib/db_orm.coffee
+# package: web-worm
 # 
 
 #-------------------------------------------------------------------------------
