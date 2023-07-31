@@ -4,7 +4,8 @@
 # package: web-worm
 # 
 
-ws_rmi = require('ws-rmi')
+# for the develop branch only we require the src coffeescript from ws_rmi
+ws_rmi = require('ws-rmi/src')
 { DB_Object } = require('./db_obj')
 { DB_ORM } = require('./db_orm')
 
@@ -29,11 +30,18 @@ class DB_RMI_Object extends ws_rmi.Object
 # used in a list of objects to be provided by WS_RMI_Server
 # 
 class DB_RMI_Server extends ws_rmi.Server
+
   constructor: (db_schema, pg_options, options) ->
+    
+    db = new DB_ORM(db_rmi_obj, db_schema)
+    objects = (table for _, table of db.tables)
+
     db_rmi_obj = new DB_RMI_Object(pg_options, options)
-    objects = [db_rmi_obj]
+    objects.push(db_rmi_obj)
+        
     super(objects, options)
-    @db = new DB_ORM(db_rmi_obj, db_schema)
+    @db = db
+    
 
 
 exports.DB_RMI_Server = DB_RMI_Server

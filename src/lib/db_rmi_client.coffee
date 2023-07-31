@@ -4,7 +4,8 @@
 # package: web-worm
 # 
 
-ws_rmi = require('ws-rmi')
+# for the develop branch only we require the src coffeescript from ws_rmi
+ws_rmi = require('ws-rmi/src')
 { DB_ORM } = require('./db_orm')
 
 

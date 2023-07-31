@@ -316,6 +316,7 @@ class DB_ORM
   # class definitions for the tables, rows and columns of the db.
   # 
   constructor: (@db_obj, @db_schema) ->
+    @__method_names = ['query']
     @init_tables()
 
   # query the db
