@@ -1,5 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-rm -rf js
-mkdir -p js
+source ./bin/defs.sh;
+
+clean;
 
