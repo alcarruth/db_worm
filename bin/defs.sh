@@ -8,8 +8,8 @@ src_dir="${root_dir}/src"
 function clean {
     echo "rm -rf ${lib_dir}"
     rm -rf ${lib_dir}
-    echo "rm *.js"
-    rm *.js
+    echo "rm -f *.js"
+    rm -f *.js
 }
 
 function build {
