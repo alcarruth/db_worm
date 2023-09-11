@@ -5,9 +5,8 @@
 # 
 
 # for the develop branch only we require the src coffeescript from ws_rmi
-ws_rmi = require('ws-rmi/src')
-{ DB_Object } = require('./db_obj')
-{ DB_ORM } = require('./db_orm')
+ws_rmi = require('ws-rmi')
+{ DB_Object, DB_ORM } = require('db-worm')
 
 
 # class DB_RMI_Object()

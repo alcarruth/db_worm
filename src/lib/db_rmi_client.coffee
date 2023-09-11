@@ -5,8 +5,8 @@
 # 
 
 # for the develop branch only we require the src coffeescript from ws_rmi
-ws_rmi = require('ws-rmi/src')
-{ DB_ORM } = require('./db_orm')
+ws_rmi = require('ws-rmi')
+{ DB_ORM } = require('db-worm')
 
 
 # Factory function create_Connection_Class()

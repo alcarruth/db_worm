@@ -22,6 +22,7 @@
   "dependencies": {
     "coffeescript": "^2.4.1",
     "pg": "^8.11.1",
+    "db-worm": "../db-worm",
     "ws-rmi": "../ws-rmi"
   }
 }

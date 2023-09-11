@@ -1,13 +1,17 @@
 #!/usr/bin/env coffee
 #
-# src/server.index.coffee
+# file: /src/server.coffee
+# package: web-worm
 # 
 
-DB_Object = require('./lib/db_obj').DB_Object
-DB_RMI_Server = require('./lib/db_rmi_server').DB_RMI_Server 
+{ DB_Object, DB_ORM } = require('db-worm/src')
+{ DB_RMI_Server } = require('./lib')
 
-exports.DB_Object = DB_Object
-exports.DB_RMI_Server = DB_RMI_Server 
+module.exports = {
+  DB_Object
+  DB_ORM
+  DB_RMI_Server
+}
 
 
 
