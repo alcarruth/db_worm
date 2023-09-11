@@ -21,7 +21,8 @@
   "license": "MIT",
   "dependencies": {
     "coffeescript": "^2.4.1",
-    "pg": "^7.12.1",
-    "ws-rmi": "git+https://github.com/alcarruth/ws-rmi.git#develop"
+    "pg": "^8.11.1",
+    "db-worm": "../db-worm",
+    "ws-rmi": "../ws-rmi"
   }
 }

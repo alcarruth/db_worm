@@ -1,10 +1,12 @@
 #!/usr/bin/env coffee
 #
-#  web-worm/src/client/db_rmi_client.coffee
+# file: /src/lib/db_rmi_client.coffee
+# package: web-worm
 # 
 
+# for the develop branch only we require the src coffeescript from ws_rmi
 ws_rmi = require('ws-rmi')
-{ DB_ORM } = require('./db_orm')
+{ DB_ORM } = require('db-worm')
 
 
 # Factory function create_Connection_Class()
